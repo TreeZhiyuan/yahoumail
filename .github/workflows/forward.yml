@@ -3,7 +3,7 @@ name: YahooMail Forward
 on:
   schedule:
     # 每3分钟执行一次
-    - cron: '*/3 * * * *'
+    - cron: '*/5 * * * *'
   workflow_dispatch:
 
 jobs:
@@ -19,11 +19,7 @@ jobs:
         run: pip install -r requirements.txt
       - name: Forward new Yahoo mails
         env:
-          YAHOO_USER: ${{ secrets.YAHOO_USER }}
-          YAHOO_APP_PASSWORD: ${{ secrets.YAHOO_APP_PASSWORD }}
-          SMTP_HOST: ${{ secrets.SMTP_HOST }}
-          SMTP_PORT: ${{ secrets.SMTP_PORT }}
-          SMTP_USER: ${{ secrets.SMTP_USER }}
-          SMTP_PASS: ${{ secrets.SMTP_PASS }}
-          FORWARD_TO: ${{ secrets.FORWARD_TO }}
+          YAHOO_EMAIL: ${{ secrets.YAHOO_EMAIL }}
+          YAHOO_APP_PASS: ${{ secrets.YAHOO_APP_PASS }}
+          TARGET_EMAIL: ${{ secrets.TARGET_EMAIL }}
         run: python forward.py
