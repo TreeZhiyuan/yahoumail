@@ -23,13 +23,24 @@ def forward_email(mail):
     print(f"[DEBUG] SMTP_PORT: {os.environ.get('SMTP_PORT')}")
     print(f"[DEBUG] SMTP_USER: {os.environ.get('SMTP_USER')}")
     print(f"[DEBUG] SMTP_PASS: {os.environ.get('SMTP_PASS')}")
-    smtp = smtplib.SMTP_SSL(os.environ['SMTP_HOST'], int(os.environ['SMTP_PORT']))
+    # Use STARTTLS (typically port 587). Connect with plain SMTP, then upgrade to TLS.
+    smtp = smtplib.SMTP(os.environ['SMTP_HOST'], int(os.environ['SMTP_PORT']))
+    smtp.ehlo()
+    smtp.starttls()
+    smtp.ehlo()
     smtp.login(os.environ['SMTP_USER'], os.environ['SMTP_PASS'])
     msg = EmailMessage()
-    msg['Subject'] = "FWD: " + mail['Subject']
+    msg['Subject'] = "FWD: " + (mail['Subject'] or '')
     msg['From'] = os.environ['SMTP_USER']
     msg['To'] = os.environ['FORWARD_TO']
-    msg.set_content(mail.get_payload())
+    # Try to get a sensible text payload
+    try:
+        body = mail.get_payload(decode=True) if mail.get_content_maintype() != 'multipart' else ''
+        if isinstance(body, bytes):
+            body = body.decode(errors='ignore')
+    except Exception:
+        body = str(mail)
+    msg.set_content(body)
     smtp.send_message(msg)
     smtp.quit()
 
