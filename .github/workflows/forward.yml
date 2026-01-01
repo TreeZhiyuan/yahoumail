@@ -3,7 +3,7 @@ name: YahooMail Forward
 on:
   schedule:
     # 每3分钟执行一次
-    - cron: '*/5 * * * *'
+    - cron: '*/20 * * * *'
   workflow_dispatch:
 
 jobs:
